@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="block" style="height:100%; width: 100%;"></div>
+    <script>
+
+        function randomColor(){
+            let letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            } return color
+        }
+
+        
+        let prevX = null
+        let prevY = null
+
+        function locateMouse() {
+            document.addEventListener('click', function(event) {
+
+
+                const x = event.clientX;
+                const y = event.clientY;
+                console.log(`X: ${x}, Y: ${y}`);
+
+                const randomForm = Math.floor(Math.random() * 50) + 2 //the first one means i have 50 options the second one + 2 means i have a possbility from 2 to 51
+                console.log(`${randomForm}%`)
+                const randomSize = Math.floor(Math.random() * 90) + 10 //the first one means i have 90 options the second one + 10 means i have a possbility from 10 to 99
+                console.log(`${randomSize}px`)
+               
+                const point = randomSize
+                const creation = document.createElement("div")
+                creation.setAttribute("id", "creation");
+                creation.style.backgroundColor = randomColor()
+                creation.style.position = "absolute"
+                creation.style.borderRadius = `${randomForm}%`
+                creation.style.height = `${randomSize}px`
+                creation.style.width = `${randomSize}px`
+                creation.style.left = `${x - randomSize / 2}px`; // here i place the block in the middle of my cursor so my cursor is in the middle of the object
+                creation.style.top = `${y  - randomSize / 2}px`; // same here, i place the block in the middle of my cursor so my cursor is in the middle of the object
+                document.getElementById("block").appendChild(creation);
+
+            if( prevX !== null && prevY !== null ) {
+                const drawx = x - prevX
+                const drawy = y - prevY 
+                const distance = Math.sqrt(drawx * drawx + drawy * drawy)
+                const angle = Math.atan2(drawy, drawx) * 180 / Math.PI;
+                const line = document.createElement('div');
+                line.setAttribute('id', 'line');
+                line.style.background = randomColor();
+                line.style.width = `${distance}px`;
+                line.style.height = "5px"; 
+                line.style.position = "absolute";
+                line.style.top = `${prevY}px`;
+                line.style.left = `${prevX}px`;
+                line.style.transform = `rotate(${angle}deg)`; 
+                line.style.transformOrigin = "0 0";  
+                document.getElementById("block").appendChild(line);
+
+                console.log(`line length: ${Math.floor(distance)}px`)
+            }
+                prevX = x;
+                prevY = y;
+            })  
+        }; locateMouse()
+
+    </script>
+</body>
+</html>
