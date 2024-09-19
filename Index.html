@@ -3,73 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Block Placement with Logs</title>
+    <style>
+        #container {
+            display: flex;
+            height: 98vh;
+        }
+        #block {
+            flex: 3;
+            background-color: #929292;
+            position: relative;
+        }
+        #logs {
+            flex: 1;
+            background-color: #333;
+            color: white;
+            overflow-y: hidden;
+            padding: 20px;
+            font-family: monospace;
+        }
+        #space {
+            background: red;
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div id="block" style="height:100%; width: 100%;"></div>
+    <div id="container">
+        <div id="block"></div>
+        <div id="logs"></div>
+    </div>
+
     <script>
 
-        function randomColor(){
+        //here you generate a random hex-color #XXXXXX that will change the entity and line
+        function randomColor() {
             let letters = '0123456789ABCDEF';
             let color = '#';
             for (let i = 0; i < 6; i++) {
                 color += letters[Math.floor(Math.random() * 16)];
-            } return color
+            }
+            return color;
         }
 
-        
-        let prevX = null
-        let prevY = null
+        //starting of the previous cords = null, after clicking somewhere it will change
+        let prevX = null;
+        let prevY = null;
 
+        //showes the data of the block on the right side of the screen
+        function logMessage(message) { 
+            const logsDiv = document.getElementById('logs');
+            logsDiv.innerHTML += message + '<br>';
+            logsDiv.scrollTop = logsDiv.scrollHeight; // Auto-scroll to the bottom
+        }
+
+        //locates the cords of your mouse and places a block in the middle of your cursor 
         function locateMouse() {
-            document.addEventListener('click', function(event) {
+            document.getElementById('block').addEventListener('click', function(event) {
+                let x = event.clientX;
+                let y = event.clientY;
+                
+                logMessage('<br>' + `X: ${x}, Y: ${y}`);
 
+                //random borderform, example: 24% 
+                const randomForm = Math.floor(Math.random() * 50) + 2;
+                logMessage(`Random Form (border radius): ${randomForm}%`);
 
-                const x = event.clientX;
-                const y = event.clientY;
-                console.log(`X: ${x}, Y: ${y}`);
+                //random size in px, example: 20px
+                const randomSize = Math.floor(Math.random() * 90) + 10;
+                logMessage(`Random Size: ${randomSize}px`);
 
-                const randomForm = Math.floor(Math.random() * 50) + 2 //the first one means i have 50 options the second one + 2 means i have a possbility from 2 to 51
-                console.log(`${randomForm}%`)
-                const randomSize = Math.floor(Math.random() * 90) + 10 //the first one means i have 90 options the second one + 10 means i have a possbility from 10 to 99
-                console.log(`${randomSize}px`)
-               
-                const point = randomSize
-                const creation = document.createElement("div")
-                creation.setAttribute("id", "creation");
-                creation.style.backgroundColor = randomColor()
-                creation.style.position = "absolute"
-                creation.style.borderRadius = `${randomForm}%`
-                creation.style.height = `${randomSize}px`
-                creation.style.width = `${randomSize}px`
-                creation.style.left = `${x - randomSize / 2}px`; // here i place the block in the middle of my cursor so my cursor is in the middle of the object
-                creation.style.top = `${y  - randomSize / 2}px`; // same here, i place the block in the middle of my cursor so my cursor is in the middle of the object
+                // the creation of the block
+                const creation = document.createElement("div");
+                creation.style.backgroundColor = randomColor();
+                creation.style.position = "absolute";
+                creation.style.borderRadius = `${randomForm}%`;
+                creation.style.height = `${randomSize}px`;
+                creation.style.width = `${randomSize}px`;
+                creation.style.left = `${x - randomSize / 2}px`;
+                creation.style.top = `${y - randomSize / 2}px`;
                 document.getElementById("block").appendChild(creation);
 
-            if( prevX !== null && prevY !== null ) {
-                const drawx = x - prevX
-                const drawy = y - prevY 
-                const distance = Math.sqrt(drawx * drawx + drawy * drawy)
-                const angle = Math.atan2(drawy, drawx) * 180 / Math.PI;
-                const line = document.createElement('div');
-                line.setAttribute('id', 'line');
-                line.style.background = randomColor();
-                line.style.width = `${distance}px`;
-                line.style.height = "5px"; 
-                line.style.position = "absolute";
-                line.style.top = `${prevY}px`;
-                line.style.left = `${prevX}px`;
-                line.style.transform = `rotate(${angle}deg)`; 
-                line.style.transformOrigin = "0 0";  
-                document.getElementById("block").appendChild(line);
+                //if the cords of your mous are in the same spot this function will not activate, only if you move youre mouse away from the same spot.
+                //after moving your mouse away from the same spot in this example 0x 0y a line will be drawn between thoes diffrent cords
+                if (prevX !== null && prevY !== null) {
+                    const drawx = x - prevX;
+                    const drawy = y - prevY;
+                    const distance = Math.sqrt(drawx * drawx + drawy * drawy);
+                    const angle = Math.atan2(drawy, drawx) * 180 / Math.PI;
+                    const line = document.createElement('div');
+                    line.style.background = randomColor();
+                    line.style.width = `${distance}px`;
+                    line.style.height = "5px";
+                    line.style.position = "absolute";
+                    line.style.top = `${prevY}px`;
+                    line.style.left = `${prevX}px`;
+                    line.style.transform = `rotate(${angle}deg)`;
+                    line.style.transformOrigin = "0 0";
+                    document.getElementById("block").appendChild(line);
 
-                console.log(`line length: ${Math.floor(distance)}px`)
-            }
+                    //here you see the line length between your blocks
+                    logMessage(`Line length: ${Math.floor(distance)}px`);
+                }
+
+                //will safe the old cords and replace after a new click
                 prevX = x;
                 prevY = y;
-            })  
-        }; locateMouse()
+            });
+        }
 
+        locateMouse();
     </script>
 </body>
 </html>
